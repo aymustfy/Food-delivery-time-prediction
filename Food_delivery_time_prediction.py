@@ -40,7 +40,19 @@ for i in range(len(data)):
                                         data.loc[i, 'Restaurant_longitude'], 
                                         data.loc[i, 'Delivery_location_latitude'], 
                                         data.loc[i, 'Delivery_location_longitude'])
-    
+
+
+# To add the vehicle type to the model 
+from sklearn import preprocessing as pr
+
+data["Code_Type_of_vehicle"]=pr.LabelEncoder().fit_transform(data["Type_of_vehicle"])
+one_hot_transform=pd.get_dummies(data,columns=["Type_of_vehicle"],drop_first=True)
+
+# Determination of the vehicle type code based on the vehicle type
+sns.scatterplot(one_hot_transform,x=data['Type_of_vehicle'],y=data['Code_Type_of_vehicle'])
+plt.show()
+
+
 figure = px.scatter(data_frame = data, 
                     x="distance",
                     y="Time_taken(min)", 
@@ -103,11 +115,25 @@ print("Food Delivery Time Prediction")
 a = int(input("Age of Delivery Partner: "))
 b = float(input("Ratings of Previous Deliveries: "))
 c = int(input("Total Distance: "))
+d = str(input("Type of Vehicle: "))
 
-features = np.array([[a, b, c]])
+# Created function for the convert to int inputting value in which vehicle type inputting as str
+def str_to_int(d):
+    if d=="scooter":
+        return d==3
+    elif d=="electric_scooter":
+        return d==1
+    elif d=="motorcycle":
+        return d==2
+    elif d=="bicycle": 
+        return d==0
+    else:
+        print("Wrong Entry. Please Enter Correctly and Try Again")
+
+
+# Vehicle type added to model features as int
+features = np.array([[a, b, c, str_to_int(d)]])
 print("Predicted Delivery Time in Minutes = ", model.predict(features))
-
-
 
 
 
